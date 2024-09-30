@@ -1,0 +1,136 @@
+Script started on Sun 29 Sep 2024 01:06:40 PM EDT
+==72296== Memcheck, a memory error detector
+==72296== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==72296== Using Valgrind-3.21.0 and LibVEX; rerun with -h for copyright info
+==72296== Command: ws english_large.csv english_small.csv
+==72296== 
+[38;5;9mBegin Testing the Program!
+--------------------------[0m
+
+Command Line:
+------------------------------------------------------
+  1: ws
+  2: english_large.csv
+  3: english_small.csv
+------------------------------------------------------
+
+T1: Search for some words
+==========:==========:==========:==========:==========
+Computer - (1) One who computes.
+
+Zigzag - (1) Something that has short turns or angles.
+Zigzag - (1) "A molding running in a zigzag line; a chevron, or series of chevrons.  See Illust. of Chevron, 3."
+Zigzag - (1) See Boyau.
+Zigzag - (3) "Having short, sharp turns; running this way and that in an onward course."
+Zigzag - (5) To form with short turns.
+Zigzag - (5) "To move in a zigzag manner; also, to have a zigzag shape."
+
+Apple - (1) The fleshy pome or fruit of a rosaceous tree (Pyrus malus) cultivated in numberless varieties in the temperate zones.
+Apple - (1) Any tree genus Pyrus which has the stalk sunken into the base of the fruit; an apple tree.
+Apple - (1) "Any fruit or other vegetable production resembling, or supposed to resemble, the apple; as, apple of love, or love apple (a tomato), balsam apple, egg apple, oak apple."
+Apple - (1) "Anything round like an apple; as, an apple of gold."
+Apple - (5) To grow like an apple; to bear apples.
+
+Germanize - (5) "To make German, or like what is distinctively German; as, to Germanize a province, a language, a society."
+Germanize - (5) To reason or write after the manner of the Germans.
+
+Passport - (1) "Permission to pass; a document given by the competent officer of a state, permitting the person therein named to pass or travel from place to place, without molestation, by land or by water."
+Passport - (1) "A document carried by neutral merchant vessels in time of war, to certify their nationality and protect them from belligerents; a sea letter."
+Passport - (1) A license granted in time of war for the removal of persons and effects from a hostile country; a safe-conduct.
+Passport - (1) Figuratively: Anything which secures advancement and general acceptance.
+
+Gone of Go
+Gone p. p. of Go.
+
+Word 'Laptop' was not found in the dictionary.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+T2: Copy Constructor
+==========:==========:==========:==========:==========
+Apple The fleshy pome or fruit of a rosaceous tree (Pyrus malus) cultivated in numberless varieties in the temperate zones.
+Ywis Certainly; most likely; truly; probably.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+T3: Copy Assignment Operator
+==========:==========:==========:==========:==========
+Efficience Alt. of Efficiency
+Apple The fleshy pome or fruit of a rosaceous tree (Pyrus malus) cultivated in numberless varieties in the temperate zones.
+Ywis Certainly; most likely; truly; probably.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+T4: Move Constructor
+==========:==========:==========:==========:==========
+Word 'Apple' was not found in the dictionary.
+Ywis Certainly; most likely; truly; probably.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+T5: Move Assignment Operator
+==========:==========:==========:==========:==========
+Efficience Alt. of Efficiency
+Word 'Apple' was not found in the dictionary.
+Ywis Certainly; most likely; truly; probably.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+T6: Search Time Measurements
+==========:==========:==========:==========:==========
+Apple The fleshy pome or fruit of a rosaceous tree (Pyrus malus) cultivated in numberless varieties in the temperate zones.
+Apple The fleshy pome or fruit of a rosaceous tree (Pyrus malus) cultivated in numberless varieties in the temperate zones.
+Apple Any tree genus Pyrus which has the stalk sunken into the base of the fruit; an apple tree.
+Apple "Any fruit or other vegetable production resembling, or supposed to resemble, the apple; as, apple of love, or love apple (a tomato), balsam apple, egg apple, oak apple."
+Apple "Anything round like an apple; as, an apple of gold."
+Apple To grow like an apple; to bear apples.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+ 1:                      Default Constructor ->     1136502 nanoseconds
+ 2:                       Custom Constructor -> 14030943599 nanoseconds
+ 3:                         Copy Constructor ->  1527750992 nanoseconds
+ 4:                 Copy Assignment Operator ->  1613503304 nanoseconds
+ 5:                         Move Constructor ->      639501 nanoseconds
+ 6:                 Move Assignment Operator ->     2931604 nanoseconds
+ 7:                               Destructor ->   544300809 nanoseconds
+ 8:      Search for a word (first occurence) ->    11928016 nanoseconds
+ 9:       Search for a word (all occurences) ->   292904782 nanoseconds
+
+10:                      Default Constructor ->        1136 microseconds
+11:                       Custom Constructor ->    14030943 microseconds
+12:                         Copy Constructor ->     1527750 microseconds
+13:                 Copy Assignment Operator ->     1613503 microseconds
+14:                         Move Constructor ->         639 microseconds
+15:                 Move Assignment Operator ->        2931 microseconds
+16:                               Destructor ->      544300 microseconds
+17:      Search for a word (first occurence) ->       11928 microseconds
+18:       Search for a word (all occurences) ->      292904 microseconds
+
+19:                      Default Constructor ->           1 milliseconds
+20:                       Custom Constructor ->       14030 milliseconds
+21:                         Copy Constructor ->        1527 milliseconds
+22:                 Copy Assignment Operator ->        1613 milliseconds
+23:                         Move Constructor ->           0 milliseconds
+24:                 Move Assignment Operator ->           2 milliseconds
+25:                               Destructor ->         544 milliseconds
+26:      Search for a word (first occurence) ->          11 milliseconds
+27:       Search for a word (all occurences) ->         292 milliseconds
+
+28:                      Default Constructor ->           0 seconds
+29:                       Custom Constructor ->          14 seconds
+30:                         Copy Constructor ->           1 seconds
+31:                 Copy Assignment Operator ->           1 seconds
+32:                         Move Constructor ->           0 seconds
+33:                 Move Assignment Operator ->           0 seconds
+34:                               Destructor ->           0 seconds
+35:      Search for a word (first occurence) ->           0 seconds
+36:       Search for a word (all occurences) ->           0 seconds
+
+[38;5;9m------------------------
+End Testing the Program![0m
+==72296== 
+==72296== HEAP SUMMARY:
+==72296==     in use at exit: 0 bytes in 0 blocks
+==72296==   total heap usage: 1,347,200 allocs, 1,347,200 frees, 221,702,023 bytes allocated
+==72296== 
+==72296== All heap blocks were freed -- no leaks are possible
+==72296== 
+==72296== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+Script done on Sun 29 Sep 2024 01:07:08 PM EDT
