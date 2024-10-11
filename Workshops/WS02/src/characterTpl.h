@@ -1,5 +1,5 @@
-#ifndef CHARACTER_TPL_H
-#define CHARACTER_TPL_H
+#ifndef SENECA_CHARACTERTPL_H
+#define SENECA_CHARACTERTPL_H
 
 #include "character.h"
 #include <iostream>
@@ -14,16 +14,21 @@ private:
 
 public:
     // Constructor
-    CharacterTpl(const char* name, int healthMax) : Character(name), m_healthMax(healthMax), m_health(healthMax) {}
-
+    CharacterTpl(const char* name, int healthMax) : Character(name), m_healthMax(healthMax) {
+        if constexpr (std::is_same<T, seneca::SuperHealth>::value || std::is_same<T, seneca::InfiniteHealth>::value) {
+            m_health = T();  // For SuperHealth or InfiniteHealth, use default constructor
+        } else {
+            m_health = healthMax;  // For numeric types, initialize with healthMax
+        }
+    }
     // Override functions
     void takeDamage(int dmg) override {
         m_health -= dmg;
         if (static_cast<int>(m_health) <= 0) {
-            std::cout << m_name << " has been defeated!" << std::endl;
+            std::cout << this->getName() << " has been defeated!" << std::endl;
             m_health = 0;  // Ensure health doesn't go below 0
         } else {
-            std::cout << m_name << " took " << dmg << " damage, " << static_cast<int>(m_health) << " health remaining." << std::endl;
+            std::cout << this->getName() << " took " << dmg << " damage, " << static_cast<int>(m_health) << " health remaining." << std::endl;
         }
     }
 
