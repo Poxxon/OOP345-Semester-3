@@ -19,7 +19,7 @@
 #include "archer.h"
 #include "archer.h"         // intentional
 
-// Cheching if header guards exist and follow convention.
+// Checking if header guards exist and follow convention.
 #ifndef SENECA_CHARACTER_H
     #error "The header guard for 'character.h' doesn't follow the convention!"
 #endif
