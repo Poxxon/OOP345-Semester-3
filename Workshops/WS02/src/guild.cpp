@@ -11,7 +11,7 @@ void Guild::addMember(Character *c) {
   if (index != -1) {
     return;
   }
-
+  // Resize if the guild capacity is full
   if (m_size == m_capacity) {
     m_capacity *= 2;
     Character **temp = new Character *[m_capacity];

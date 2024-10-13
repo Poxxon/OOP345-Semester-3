@@ -16,10 +16,12 @@ class Rogue : public CharacterTpL<T> {
   Dagger m_weapon;
 
 public:
+  // Constructor initializes Rogue with name, health, attack, and defense
   Rogue(const char *name, int healthMax, int baseAttack, int baseDefense)
       : CharacterTpL<T>(name, healthMax), m_baseAttack(baseAttack),
         m_baseDefense(baseDefense) {}
 
+  // Copy constructor
   Rogue(const Rogue &other) : CharacterTpL<T>(other) {
     m_baseAttack = other.m_baseAttack;
     m_baseDefense = other.m_baseDefense;
@@ -28,6 +30,7 @@ public:
     m_weapon = other.m_weapon;
   }
 
+  // Returns adjusted attack amount based on weapon
   int getAttackAmnt() const override {
     return m_baseAttack + 2 * (double)m_weapon;
   }
@@ -36,6 +39,7 @@ public:
 
   Character *clone() const override { return new Rogue(*this); }
 
+  // Rogue attacking an enemy character
   void attack(Character *enemy) override {
     std::cout << CharacterTpL<T>::getName() << " is attacking "
               << enemy->getName() << ".\n";
@@ -50,6 +54,7 @@ public:
     enemy->takeDamage(dmg);
   }
 
+  // Take damage and adjust it based on defense and abilities
   void takeDamage(int dmg) override {
     std::cout << CharacterTpL<T>::getName() << " is attacked for " << dmg
               << " damage.\n";

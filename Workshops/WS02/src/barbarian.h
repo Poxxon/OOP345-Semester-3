@@ -16,6 +16,7 @@ class Barbarian : public CharacterTpL<T> {
   Weapon_t m_weapon[2];
 
 public:
+  // Constructor to initialize Barbarian with health, attack, defense, ability, and weapon
   Barbarian(const char *name, int healthMax, int baseAttack, int baseDefense,
             Weapon_t primaryWeapon, Weapon_t secondaryWeapon)
       : CharacterTpL<T>(name, healthMax), m_baseAttack(baseAttack),
@@ -24,6 +25,7 @@ public:
     m_weapon[1] = secondaryWeapon;
   }
 
+  // Copy constructor
   Barbarian(const Barbarian &other) : CharacterTpL<T>(other) {
     m_baseAttack = other.m_baseAttack;
     m_baseDefense = other.m_baseDefense;
@@ -37,9 +39,11 @@ public:
   }
 
   int getDefenseAmnt() const override { return m_baseDefense; }
-
+  
+  // Clone method for duplicating a Barbarian
   Character *clone() const override { return new Barbarian(*this); }
 
+  // Barbarian attacking an enemy character
   void attack(Character *target) override {
     std::cout << CharacterTpL<T>::getName() << " is attacking "
               << target->getName() << ".\n";
@@ -50,6 +54,7 @@ public:
     target->takeDamage(dmg);
   }
 
+  // Take damage and reduce it by defense value
   void takeDamage(int dmg) override {
     std::cout << CharacterTpL<T>::getName() << " is attacked for " << dmg
               << " damage.\n";

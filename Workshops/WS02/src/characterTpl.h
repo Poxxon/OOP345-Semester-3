@@ -11,11 +11,13 @@ template <typename T> class CharacterTpL : public Character {
   T m_health;
 
 public:
+  // Constructor initializing character name and health
   CharacterTpL(const char *name, int healthMax)
       : Character(name), m_healthMax(healthMax) {
     m_health = (int)m_healthMax;
   }
 
+  // Copy constructor
   CharacterTpL(const CharacterTpL &other)
       : Character(other.getName().c_str()), m_healthMax(other.m_healthMax) {
     m_health = (int)other.m_healthMax;

@@ -13,6 +13,7 @@ class Guild {
 
   std::string m_name;
 
+  // Helper function to find a member by name
   int findMember(const std::string &c) const {
     for (size_t i = 0; i < m_size; ++i) {
       if (m_members[i]->getName() == c) {
@@ -23,14 +24,17 @@ class Guild {
   }
 
 public:
+  // Default constructor
   Guild()
       : m_size(0), m_capacity(2), m_members(new Character *[m_capacity]),
         m_name("") {}
 
+  // Constructor with guild name
   Guild(const char *name)
       : m_size(0), m_capacity(2), m_members(new Character *[m_capacity]),
         m_name(name) {}
 
+  // Copy constructor
   Guild(const Guild &other) {
     m_size = other.m_size;
     m_capacity = other.m_capacity;
