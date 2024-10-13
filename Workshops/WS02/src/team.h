@@ -2,141 +2,111 @@
 #define SENECA_TEAM_H
 
 #include "character.h"
-#include <iostream>
-#include <cstring>
+#include <string>
 
 namespace seneca {
 
 class Team {
-private:
-    std::string m_name;
-    Character** m_members;
-    size_t m_count;
+  size_t m_size = 0;
+  size_t m_capacity = 0;
+  Character **m_team;
 
-    // Helper to clean up memory
-    void cleanup() {
-        for (size_t i = 0; i < m_count; ++i) {
-            delete m_members[i];
-        }
-        delete[] m_members;
+  std::string m_name;
+
+  int findMember(const std::string &c) const {
+    for (size_t i = 0; i < m_size; ++i) {
+      if (m_team[i]->getName() == c) {
+        return i;
+      }
     }
+    return -1;
+  }
 
 public:
-    // Default constructor
-    Team() : m_name(""), m_members(nullptr), m_count(0) {}
+  Team()
+      : m_size(0), m_capacity(2), m_team(new Character *[m_capacity]),
+        m_name("") {}
 
-    // Constructor with team name
-    Team(const char* name) : m_name(name), m_members(nullptr), m_count(0) {}
+  Team(const char *name)
+      : m_size(0), m_capacity(2), m_team(new Character *[m_capacity]),
+        m_name(name) {}
 
-    // Rule of 5: Destructor
-    ~Team() {
-        cleanup();
+  Team(const Team &other) {
+    m_size = other.m_size;
+    m_capacity = other.m_capacity;
+    m_team = new Character *[m_capacity];
+    for (size_t i = 0; i < m_size; ++i) {
+      m_team[i] = other.m_team[i]->clone();
     }
+    m_name = other.m_name;
+  }
 
-    // Rule of 5: Copy constructor
-    Team(const Team& other) : m_name(other.m_name), m_members(nullptr), m_count(other.m_count) {
-        if (m_count > 0) {
-            m_members = new Character*[m_count];
-            for (size_t i = 0; i < m_count; ++i) {
-                m_members[i] = other.m_members[i]->clone();
-            }
-        }
+  Team &operator=(const Team &other) {
+    if (this != &other) {
+      for (size_t i = 0; i < m_size; ++i) {
+        delete m_team[i];
+      }
+      delete[] m_team;
+
+      m_size = other.m_size;
+      m_capacity = other.m_capacity;
+      m_team = new Character *[m_capacity];
+      for (size_t i = 0; i < m_size; ++i) {
+        m_team[i] = other.m_team[i]->clone();
+      }
+      m_name = other.m_name;
     }
+    return *this;
+  }
 
-    // Rule of 5: Copy assignment operator
-    Team& operator=(const Team& other) {
-        if (this != &other) { 
-            cleanup();  
-            m_name = other.m_name;
-            m_count = other.m_count;
-            if (m_count > 0) {
-                m_members = new Character*[m_count];
-                for (size_t i = 0; i < m_count; ++i) {
-                    m_members[i] = other.m_members[i]->clone();
-                }
-            }
-        }
-        return *this;
+  Team(Team &&other) noexcept {
+    m_size = other.m_size;
+    m_capacity = other.m_capacity;
+    m_team = other.m_team;
+    m_name = other.m_name;
+
+    other.m_size = 0;
+    other.m_capacity = 0;
+    other.m_team = nullptr;
+    other.m_name = "";
+  }
+
+  Team &operator=(Team &&other) noexcept {
+    if (this != &other) {
+      for (size_t i = 0; i < m_size; ++i) {
+        delete m_team[i];
+      }
+      delete[] m_team;
+
+      m_size = other.m_size;
+      m_capacity = other.m_capacity;
+      m_team = other.m_team;
+      m_name = other.m_name;
+
+      other.m_size = 0;
+      other.m_capacity = 0;
+      other.m_team = nullptr;
+      other.m_name = "";
     }
+    return *this;
+  }
 
-    // Rule of 5: Move constructor
-    Team(Team&& other) noexcept : m_name(std::move(other.m_name)), m_members(other.m_members), m_count(other.m_count) {
-        other.m_members = nullptr; 
-        other.m_count = 0;
+  ~Team() {
+    for (size_t i = 0; i < m_size; ++i) {
+      delete m_team[i];
     }
+    delete[] m_team;
+  }
 
-    // Rule of 5: Move assignment operator
-    Team& operator=(Team&& other) noexcept {
-        if (this != &other) {  
-            cleanup();  
-            m_name = std::move(other.m_name);
-            m_members = other.m_members;
-            m_count = other.m_count;
-            other.m_members = nullptr; 
-            other.m_count = 0;
-        }
-        return *this;
-    }
+  void addMember(const Character *c);
 
-    // Add member function
-    void addMember(const Character* c) {
-        for (size_t i = 0; i < m_count; ++i) {
-            if (m_members[i]->getName() == c->getName()) {
-                return;
-            }
-        }
-        Character** temp = new Character*[m_count + 1];
-        for (size_t i = 0; i < m_count; ++i) {
-            temp[i] = m_members[i];
-        }
-        temp[m_count] = c->clone();
-        delete[] m_members;
-        m_members = temp;
-        ++m_count;
-    }
+  void removeMember(const std::string &c);
 
-    // Remove member by name
-    void removeMember(const std::string& name) {
-        for (size_t i = 0; i < m_count; ++i) {
-            if (m_members[i]->getName() == name) {
-                delete m_members[i];
-                for (size_t j = i; j < m_count - 1; ++j) {
-                    m_members[j] = m_members[j + 1];
-                }
-                --m_count;
-                break;
-            }
-        }
-    }
+  Character *operator[](size_t idx) const;
 
-    // Overloaded [] operator to access members
-    Character* operator[](size_t idx) const {
-        if (idx < m_count) {
-            return m_members[idx];
-        }
-        return nullptr;
-    }
-
-    // Show members
-    // Team.h
-    void showMembers() const {
-        if (m_count == 0) {
-            std::cout << "No team." << std::endl;
-        } else {
-            std::cout << "[Team] " << m_name << std::endl;
-            for (size_t i = 0; i < m_count; ++i) {
-                Character* member = m_members[i];
-                std::cout << "    " << i + 1 << ": " << member->getName()
-                          << "            Health: " << member->getHealth() * 100 / member->getHealthMax() << "% ("
-                          << member->getHealth() << "/" << member->getHealthMax() << ")  "
-                          << "Attack: " << member->getAttackAmnt() << "  "
-                          << "Defense: " << member->getDefenseAmnt() << std::endl;
-            }
-        }
-    }
-
+  void showMembers() const;
 };
 
-}
+} // namespace seneca
 
 #endif
