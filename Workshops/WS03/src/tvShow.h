@@ -1,15 +1,3 @@
-/*===============================================================
-Name:           Pouya Rad
-Student Number: 164382228
-Email:          prad@myseneca.ca
-Section:        NDD
-
-I declare that this submission is the result of my own work and I
-only copied the code that my professor provided to complete my
-workshops and assignments. This submitted piece of work has not
-been shared with any other student or 3rd party content provider.
-=================================================================*/
-
 #ifndef SENECA_TVSHOW_H
 #define SENECA_TVSHOW_H
 
@@ -26,20 +14,20 @@ been shared with any other student or 3rd party content provider.
 
 namespace seneca {
 
+// Forward declaration of TvShow
 class TvShow;
 
-// structure for episode
 struct TvEpisode {
-    const TvShow* m_show{};            // ptr to parent TV show
-    unsigned short m_numberOverall{};  // overall episode number
-    unsigned short m_season{};         // season number
-    unsigned short m_numberInSeason{}; // number in the season
-    std::string m_airDate{};           // date
-    unsigned int m_length{};           // in seconds
-    std::string m_title{};             // title
-    std::string m_summary{};           // summary
+    const TvShow* m_show{};            // Pointer to the parent TV show
+    unsigned short m_numberOverall{};  // Overall episode number across seasons
+    unsigned short m_season{};         // Season number
+    unsigned short m_numberInSeason{}; // Episode number within the season
+    std::string m_airDate{};           // Air date of the episode
+    unsigned int m_length{};           // Length of the episode in seconds
+    std::string m_title{};             // Title of the episode
+    std::string m_summary{};           // Summary of the episode
 
-    // intialize
+    // Constructs a TvEpisode object with specified details.
     TvEpisode(const TvShow* show, unsigned short numberOverall, unsigned short season,
               unsigned short numberInSeason, const std::string& airDate,
               unsigned int length, const std::string& title,
@@ -50,54 +38,53 @@ struct TvEpisode {
 };
 
 class TvShow : public MediaItem {
-    std::string m_id;                     // id
-    std::vector<TvEpisode> m_episodes;    // list of eps
+    std::string m_id;                     // Unique identifier for the TV show
+    std::vector<TvEpisode> m_episodes;    // List of episodes in the TV show
 
-    // private constructor
+    // Private constructor to enforce controlled creation of TvShow objects.
     TvShow(const std::string& id, const std::string& title, const std::string& summary, unsigned short year)
         : MediaItem(title, summary, year), m_id(id) {}
 
 public:
-    // display func
+    // Displays the TV show and its episodes to the provided output stream.
     void display(std::ostream& out) const override;
 
-    // create from csv
+    // Creates a TvShow object from a CSV-formatted string.
     static TvShow* createItem(const std::string& strShow);
 
-
-    // add episode full functionality
+    // Adds an episode to the TV show collection from a CSV-formatted string.
     template <typename Collection_t>
     static void addEpisode(Collection_t& col, const std::string& strEpisode) {
         if (strEpisode.empty() || strEpisode[0] == '#') {
-            throw "Not a valid episode.";
+            throw "Not a valid episode."; // Skip empty or comment lines
         }
 
         std::istringstream stream(strEpisode);
         std::string id, airDate, lengthStr, title, summary, seasonStr;
         unsigned short numberOverall, season = 1, numberInSeason;
 
-        // parse time strings in hh:mm:ss
+        // Lambda to parse time strings in hh:mm:ss format
         auto parseTime = [](const std::string& timeStr) -> unsigned int {
             unsigned int hours = 0, minutes = 0, seconds = 0;
             char delimiter; // For ':'
             std::istringstream timeStream(timeStr);
             timeStream >> hours >> delimiter >> minutes >> delimiter >> seconds;
-            return hours * 3600 + minutes * 60 + seconds;
+            return hours * 3600 + minutes * 60 + seconds; // Convert to seconds
         };
 
-        // parse csv 
-        std::getline(stream, id, ',');               // id
-        stream >> numberOverall;                     // ep no
-        stream.ignore();                             // ignore comma
-        std::getline(stream, seasonStr, ',');        // season num
-        stream >> numberInSeason;                    // ep num in season
-        stream.ignore();                             // ignore comma
-        std::getline(stream, airDate, ',');          // date
-        std::getline(stream, lengthStr, ',');        // length string
-        std::getline(stream, title, ',');            // title
-        std::getline(stream, summary);               // summary
+        // Parse the CSV fields
+        std::getline(stream, id, ',');               // ID
+        stream >> numberOverall;                     // Overall episode number
+        stream.ignore();                             // Ignore comma
+        std::getline(stream, seasonStr, ',');        // Season number
+        stream >> numberInSeason;                    // Episode number in season
+        stream.ignore();                             // Ignore comma
+        std::getline(stream, airDate, ',');          // Air date
+        std::getline(stream, lengthStr, ',');        // Episode length as a string
+        std::getline(stream, title, ',');            // Title
+        std::getline(stream, summary);               // Summary
 
-        // trim whitespaces
+        // Trim whitespace from fields
         trim(id);
         trim(seasonStr);
         trim(airDate);
@@ -105,21 +92,21 @@ public:
         trim(title);
         trim(summary);
 
-        // handle missing season number
+        // Handle missing season number
         if (seasonStr.empty()) {
-            season = 1; // def to 1
+            season = 1; // Default to season 1
         } else {
             try {
-                season = std::stoi(seasonStr); // convert to int if not empty
+                season = std::stoi(seasonStr); // Convert to integer
             } catch (...) {
                 season = 1;
             }
         }
 
-        // convert length to seconds
+        // Convert episode length to seconds
         unsigned int lengthInSeconds = parseTime(lengthStr);
 
-        // find matching tv show by id
+        // Find the matching TV show by ID in the collection
         TvShow* matchingShow = nullptr;
         for (size_t i = 0; i < col.size(); ++i) {
             MediaItem* item = col[i];
@@ -130,21 +117,21 @@ public:
             }
         }
         if (!matchingShow) {
-            throw "show not found for episode.";
+            throw "Show not found for episode."; // Error if no matching show
         }
 
-        // add ep to tv show
+        // Create and add the episode to the TV show
         TvEpisode episode = {matchingShow, numberOverall, season, numberInSeason, airDate, lengthInSeconds, title, summary};
         matchingShow->m_episodes.push_back(episode);
     }
 
-    // avg episode length
+    // Calculates the average length of episodes in the TV show.
     double getEpisodeAverageLength() const;
 
-    // >60m 
+
+    // Retrieves a list of titles of episodes longer than 60 minutes.
     std::list<std::string> getLongEpisodes() const;
 };
+}
 
-} 
-
-#endif
+#endif // SENECA_TVSHOW_H
