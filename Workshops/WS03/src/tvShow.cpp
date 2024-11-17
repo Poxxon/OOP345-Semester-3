@@ -13,119 +13,126 @@ been shared with any other student or 3rd party content provider.
 #include "tvShow.h"
 #include <sstream>
 #include <iomanip>
-#include <numeric>
+
 namespace seneca {
 
-// Display TV show details, including episodes
-void TvShow::display(std::ostream& out) const {
-    if (g_settings.m_tableView) { // Table view formatting
-        out << "S | ";
-        out << std::left << std::setfill('.');
-        out << std::setw(50) << this->getTitle() << " | "; // Show title
-        out << std::right << std::setfill(' ');
-        out << std::setw(2) << this->m_episodes.size() << " | "; // Episode count
-        out << std::setw(4) << this->getYear() << " | ";         // Release year
-        out << std::left;
 
-        // Show summary
-        if (g_settings.m_maxSummaryWidth > -1) {
-            if (static_cast<short>(this->getSummary().size()) <= g_settings.m_maxSummaryWidth) {
-                out << this->getSummary();
-            } else {
-                out << this->getSummary().substr(0, g_settings.m_maxSummaryWidth - 3) << "...";
-            }
-        } else {
-            out << this->getSummary();
-        }
-        out << std::endl;
-    } else { // Detailed view formatting
-        size_t pos = 0;
-        out << this->getTitle() << " [" << this->getYear() << "]\n";
-        out << std::setw(this->getTitle().size() + 7) << std::setfill('-') << "" << '\n';
-
-        // Display summary in chunks
-        while (pos < this->getSummary().size()) {
-            out << "    " << this->getSummary().substr(pos, g_settings.m_maxSummaryWidth) << '\n';
-            pos += g_settings.m_maxSummaryWidth;
-        }
-
-        // Display episodes
-        for (const auto& episode : m_episodes) {
-            out << std::setfill('0') << std::right;
-            out << "    S" << std::setw(2) << episode.m_season << "E" << std::setw(2) << episode.m_numberInSeason << ' ';
-
-            if (!episode.m_title.empty()) {
-                out << episode.m_title << '\n';
-            } else {
-                out << "Episode " << episode.m_numberOverall << '\n';
-            }
-
-            // Display episode summary in chunks
-            pos = 0;
-            while (pos < episode.m_summary.size()) {
-                out << "            " << episode.m_summary.substr(pos, g_settings.m_maxSummaryWidth - 8) << '\n';
-                pos += g_settings.m_maxSummaryWidth - 8;
-            }
-        }
-        out << std::setw(this->getTitle().size() + 7) << std::setfill('-') << "" << std::setfill(' ') << '\n';
+  // display func
+  void TvShow::display(std::ostream& out) const
+  {
+    if (g_settings.m_tableView)
+    {
+      out << "S | ";
+      out << std::left << std::setfill('.');
+      out << std::setw(50) << this->getTitle() << " | ";
+      out << std::right << std::setfill(' ');
+      out << std::setw(2) << this->m_episodes.size() << " | ";
+      out << std::setw(4) << this->getYear() << " | ";
+      out << std::left;
+      if (g_settings.m_maxSummaryWidth > -1)
+      {
+        if (static_cast<short>(this->getSummary().size()) <= g_settings.m_maxSummaryWidth)
+          out << this->getSummary();
+        else
+          out << this->getSummary().substr(0, g_settings.m_maxSummaryWidth - 3) << "...";
+      }
+      else
+        out << this->getSummary();
+      out << std::endl;
     }
-}
+    else
+    {
+      size_t pos = 0;
+      out << this->getTitle() << " [" << this->getYear() << "]\n";
+      out << std::setw(this->getTitle().size() + 7) << std::setfill('-') << "" << '\n';
+      while (pos < this->getSummary().size())
+      {
+        out << "    " << this->getSummary().substr(pos, g_settings.m_maxSummaryWidth) << '\n';
+        pos += g_settings.m_maxSummaryWidth;
+      }
+      for (auto& item : m_episodes)
+      {
+        out << std::setfill('0') << std::right;
+        out << "    " << 'S' << std::setw(2) << item.m_season
+          << 'E' << std::setw(2) << item.m_numberInSeason << ' ';
+        if (item.m_title != "")
+          out << item.m_title << '\n';
+        else
+          out << "Episode " << item.m_numberOverall << '\n';
 
-// Create a TV show from a CSV-formatted string
-TvShow* TvShow::createItem(const std::string& strShow) {
-    if (strShow.empty() || strShow[0] == '#') {
-        throw "Not a valid show."; // Invalid input
+        pos = 0;
+        while (pos < item.m_summary.size())
+        {
+          out << "            " << item.m_summary.substr(pos, g_settings.m_maxSummaryWidth - 8) << '\n';
+          pos += g_settings.m_maxSummaryWidth - 8;
+        }
+      }
+      out << std::setw(this->getTitle().size() + 7) << std::setfill('-') << ""
+        << std::setfill(' ') << '\n';
     }
+  }
 
-    std::istringstream stream(strShow);
-    std::string id, title, yearStr, summary;
 
-    // Parse CSV fields
-    std::getline(stream, id, ',');
-    std::getline(stream, title, ',');
-    std::getline(stream, yearStr, ',');
-    std::getline(stream, summary);
+  // create tvshow from csv
+  TvShow* TvShow::createItem(const std::string& strShow) {
+      if (strShow.empty() || strShow[0] == '#') {
+          throw "Not a valid show.";
+      }
 
-    // Trim whitespace
-    trim(id);
-    trim(title);
-    trim(yearStr);
-    trim(summary);
+      std::istringstream stream(strShow);
+      std::string id, title, yearStr, summary;
 
-    // Convert year string to unsigned short
-    unsigned short year = std::stoi(yearStr);
+      // parse csv
+      std::getline(stream, id, ',');
+      std::getline(stream, title, ',');
+      std::getline(stream, yearStr, ',');
+      std::getline(stream, summary);
 
-    return new TvShow(id, title, summary, year);
-}
+      // trim whitespaces
+      trim(id);
+      trim(title);
+      trim(yearStr);
+      trim(summary);
 
-// Calculate the average length of episodes in seconds
-double TvShow::getEpisodeAverageLength() const {
-    if (m_episodes.empty()) {
-        return 0.0;
-    }
+      // convert to appropiate type
+      unsigned short year = std::stoi(yearStr);
 
-    // Use std::accumulate to calculate total length
-    auto totalLength = std::accumulate(m_episodes.begin(), m_episodes.end(), 0u,
-        [](unsigned int sum, const TvEpisode& episode) {
-            return sum + episode.m_length;
-        });
+      return new TvShow(id, title, summary, year);
+  }
 
-    return static_cast<double>(totalLength) / m_episodes.size(); // Return average
-}
 
-// Get titles of episodes longer than 60 minutes
-std::list<std::string> TvShow::getLongEpisodes() const {
-    std::list<std::string> longEpisodes;
+  // avg length
+  double TvShow::getEpisodeAverageLength() const {
+      if (m_episodes.empty()) {
+          return 0.0;
+      }
+      // use accumulate to calc total length of all eps
+      auto totalLength = std::accumulate(m_episodes.begin(), m_episodes.end(), 0u,
+          [](unsigned int sum, const TvEpisode& episode) {
+              // add to running sum
+              return sum + episode.m_length;
+          });
+      // divide by num of eps and return as double
+      return static_cast<double>(totalLength) / m_episodes.size();
+  }
 
-    // Iterate through episodes to find those longer than 3600 seconds (60 minutes)
-    std::for_each(m_episodes.begin(), m_episodes.end(),
-        [&](const TvEpisode& episode) {
-            if (episode.m_length >= 3600) {
-                longEpisodes.push_back(episode.m_title);
-            }
-        });
 
-    return longEpisodes;
-}
+  // get eps greater than 60m
+  std::list<std::string> TvShow::getLongEpisodes() const {
+      std::list<std::string> longEpisodes;
 
-} // namespace end
+      // for each iterate thru all eps and check length
+      std::for_each(m_episodes.begin(), m_episodes.end(),
+          [&](const TvEpisode& episode) {      // <------- tried not using capture by ref but couldnt figure it out :( 
+              if (episode.m_length >= 3600) {  // only episodes greater than 1h (60sx60m)
+                  longEpisodes.push_back(episode.m_title);
+              }
+          });
+
+      return longEpisodes;
+  }
+
+
+
+
+  }  

@@ -26,52 +26,125 @@ been shared with any other student or 3rd party content provider.
 
 namespace seneca {
 
-// Represents a TV episode
-struct TvEpisode {
-    const TvShow* m_show{};            // Pointer to parent TV show
-    unsigned short m_numberOverall{};  // Overall episode number
-    unsigned short m_season{};         // Season number
-    unsigned short m_numberInSeason{}; // Episode number in the season
-    std::string m_airDate{};           // Air date
-    unsigned int m_length{};           // Length in seconds
-    std::string m_title{};             // Title of the episode
-    std::string m_summary{};           // Summary of the episode
+class TvShow;
 
-    // Constructor for TvEpisode
+// structure for episode
+struct TvEpisode {
+    const TvShow* m_show{};            // ptr to parent TV show
+    unsigned short m_numberOverall{};  // overall episode number
+    unsigned short m_season{};         // season number
+    unsigned short m_numberInSeason{}; // number in the season
+    std::string m_airDate{};           // date
+    unsigned int m_length{};           // in seconds
+    std::string m_title{};             // title
+    std::string m_summary{};           // summary
+
+    // intialize
     TvEpisode(const TvShow* show, unsigned short numberOverall, unsigned short season,
               unsigned short numberInSeason, const std::string& airDate,
-              unsigned int length, const std::string& title, const std::string& summary)
+              unsigned int length, const std::string& title,
+              const std::string& summary)
         : m_show(show), m_numberOverall(numberOverall), m_season(season),
           m_numberInSeason(numberInSeason), m_airDate(airDate), m_length(length),
           m_title(title), m_summary(summary) {}
 };
 
-// Represents a TV show
 class TvShow : public MediaItem {
-    std::string m_id;                     // Unique identifier for the show
-    std::vector<TvEpisode> m_episodes;    // List of episodes
+    std::string m_id;                     // id
+    std::vector<TvEpisode> m_episodes;    // list of eps
 
-    // Private constructor to enforce controlled creation
+    // private constructor
     TvShow(const std::string& id, const std::string& title, const std::string& summary, unsigned short year)
         : MediaItem(title, summary, year), m_id(id) {}
 
 public:
-    // Display the TV show and episodes
+    // display func
     void display(std::ostream& out) const override;
 
-    // Create a TV show from a CSV string
+    // create from csv
     static TvShow* createItem(const std::string& strShow);
 
-    // Add an episode to a collection of TV shows
-    template <typename Collection_t>
-    static void addEpisode(Collection_t& col, const std::string& strEpisode);
 
-    // Get the average length of episodes
+    // add episode full functionality
+    template <typename Collection_t>
+    static void addEpisode(Collection_t& col, const std::string& strEpisode) {
+        if (strEpisode.empty() || strEpisode[0] == '#') {
+            throw "Not a valid episode.";
+        }
+
+        std::istringstream stream(strEpisode);
+        std::string id, airDate, lengthStr, title, summary, seasonStr;
+        unsigned short numberOverall, season = 1, numberInSeason;
+
+        // parse time strings in hh:mm:ss
+        auto parseTime = [](const std::string& timeStr) -> unsigned int {
+            unsigned int hours = 0, minutes = 0, seconds = 0;
+            char delimiter; // For ':'
+            std::istringstream timeStream(timeStr);
+            timeStream >> hours >> delimiter >> minutes >> delimiter >> seconds;
+            return hours * 3600 + minutes * 60 + seconds;
+        };
+
+        // parse csv 
+        std::getline(stream, id, ',');               // id
+        stream >> numberOverall;                     // ep no
+        stream.ignore();                             // ignore comma
+        std::getline(stream, seasonStr, ',');        // season num
+        stream >> numberInSeason;                    // ep num in season
+        stream.ignore();                             // ignore comma
+        std::getline(stream, airDate, ',');          // date
+        std::getline(stream, lengthStr, ',');        // length string
+        std::getline(stream, title, ',');            // title
+        std::getline(stream, summary);               // summary
+
+        // trim whitespaces
+        trim(id);
+        trim(seasonStr);
+        trim(airDate);
+        trim(lengthStr);
+        trim(title);
+        trim(summary);
+
+        // handle missing season number
+        if (seasonStr.empty()) {
+            season = 1; // def to 1
+        } else {
+            try {
+                season = std::stoi(seasonStr); // convert to int if not empty
+            } catch (...) {
+                season = 1;
+            }
+        }
+
+        // convert length to seconds
+        unsigned int lengthInSeconds = parseTime(lengthStr);
+
+        // find matching tv show by id
+        TvShow* matchingShow = nullptr;
+        for (size_t i = 0; i < col.size(); ++i) {
+            MediaItem* item = col[i];
+            TvShow* show = dynamic_cast<TvShow*>(item);
+            if (show && show->m_id == id) {
+                matchingShow = show;
+                break;
+            }
+        }
+        if (!matchingShow) {
+            throw "show not found for episode.";
+        }
+
+        // add ep to tv show
+        TvEpisode episode = {matchingShow, numberOverall, season, numberInSeason, airDate, lengthInSeconds, title, summary};
+        matchingShow->m_episodes.push_back(episode);
+    }
+
+    // avg episode length
     double getEpisodeAverageLength() const;
 
-    // Get titles of episodes longer than 60 minutes
+    // >60m 
     std::list<std::string> getLongEpisodes() const;
 };
-}
 
-#endif // SENECA_TVSHOW_H
+} 
+
+#endif
