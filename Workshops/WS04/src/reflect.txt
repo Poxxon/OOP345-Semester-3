@@ -1,0 +1,1 @@
+Tester 2 enhanced my understanding of dynamic memory management and move semantics while implementing the `CustomerOrder` module. It emphasized the importance of precise parsing and logic for tracking and filling items efficiently, reinforcing clean and modular design principles.
